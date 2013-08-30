@@ -1,3 +1,5 @@
+SHELL = /bin/sh 
+
 NAME = d2clr
 
 FNAME   = ${NAME}
@@ -10,7 +12,7 @@ PKG-CONFIG = pkg-config --cflags --libs
 
 CLFLAGS = ${PKG-CONFIG} glib-2.0 dbus-1 dbus-glib-1 x11 xtst
 
-.PHONY = compile
+.PHONY = all
 
-compile:
+all:
 	${LC_M} gcc `${CLFLAGS}` -std=gnu99 ${SOURCES} -o ${FNAME}
