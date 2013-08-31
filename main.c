@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 FIL
+ * Copyright FIL 2013
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,25 +27,41 @@
 
 #define NOTIFY_H_MSG_RU "Состояние подбора игры"
 #define NOTIFY_B_MSG_RU "Ваша игра готова"
+#define NOTIFY_H_MSG_EN "Matchmaking Status"
+#define NOTIFY_B_MSG_EN "Your game is ready"
+#define NOTIFY_H_MSG_DE "Matchmaking-Status"
+#define NOTIFY_B_MSG_DE "Ihr Spiel ist bereit"
+
 #define DBUS_RULE "eavesdrop=true,type='method_call'"
 
 #define HELP "Usage d2clr [OPTIONS]...\n" \
 "Actions:\n" \
 "  -x,-X                   X \"Accept\" button coordinate.\n" \
 "  -y,-Y                   Y \"Accept\" button coordinate.\n" \
+"  -l(en|ru|de)            Language \"Dota 2\" game.\n" \
 "  -h                      Print help.\n"
+
+enum
+{
+	en,
+	ru,
+	de
+} lang;
 
 typedef struct
 {
 	Display *display;
 	int x;
 	int y;
+	int lang;
 } m_data;
 
 DBusHandlerResult signal_filter(DBusConnection *connection, DBusMessage *msg, void *user_data)
 {
 	if (dbus_message_is_method_call(msg, "org.freedesktop.Notifications", "Notify"))
 	{
+		m_data *data = (m_data*)user_data;
+		
 		DBusMessageIter iter;
 		dbus_message_iter_init(msg, &iter);
 		
@@ -56,15 +72,29 @@ DBusHandlerResult signal_filter(DBusConnection *connection, DBusMessage *msg, vo
 			dbus_message_iter_next (&iter);
 		dbus_message_iter_get_basic (&iter, &val);
 		
-		if (strcmp(val, NOTIFY_H_MSG_RU) == 0) 
+		char *notify_h, *notify_b;
+		switch (data->lang)
 		{
-			
+			case en:
+				notify_h = NOTIFY_H_MSG_EN;
+				notify_b = NOTIFY_B_MSG_EN;
+			break;
+			case ru:
+				notify_h = NOTIFY_H_MSG_RU;
+				notify_b = NOTIFY_B_MSG_RU;
+			break;
+			case de:
+				notify_h = NOTIFY_H_MSG_DE;
+				notify_b = NOTIFY_B_MSG_DE;
+			break;
+		}
+		if (strcmp(val, notify_h) == 0) 
+		{
 			dbus_message_iter_next (&iter);
 			dbus_message_iter_get_basic (&iter, &val);
 			
-			if (strcmp(val, NOTIFY_B_MSG_RU) == 0)
+			if (strcmp(val, notify_b) == 0)
 			{
-				m_data *data = (m_data*)user_data;
 				//activated Dota 2 window
 				sleep(1);
 				system("wmctrl -a \"DOTA 2 - OpenGL\"");
@@ -88,11 +118,13 @@ DBusHandlerResult signal_filter(DBusConnection *connection, DBusMessage *msg, vo
 	return DBUS_HANDLER_RESULT_HANDLED;
 }
 
+#define help() fputs(HELP, stdout)
+
 int main(int argc, char **argv)
 {
-	if (argc <= 4)
+	if (argc <= 6)
 	{
-		fputs(HELP, stdout);
+		help();
 		return EXIT_FAILURE;
 	}
 	
@@ -100,7 +132,7 @@ int main(int argc, char **argv)
 	
 	int opt = 0;
 	//opterr = 0;
-	while ((opt = getopt(argc,argv,"X:x:Y:y:h:")) != -1)
+	while ((opt = getopt(argc,argv,"X:x:Y:y:l:h:")) != -1)
 	{
 		switch (opt)
 		{
@@ -110,8 +142,21 @@ int main(int argc, char **argv)
 			case 'Y': case 'y':
 				sscanf(optarg, "%d", &data.y);
 			break;
+			case 'l':
+				if (strcmp(optarg, "en") == 0)
+					data.lang = en;
+				else if (strcmp(optarg, "ru") == 0)
+					data.lang = ru;
+				else if (strcmp(optarg, "de") == 0)
+					data.lang = de;
+				else
+				{
+					printf("Unknow lang!\n");
+					return EXIT_FAILURE;
+				}
+			break;
 			case 'h': case '?':
-				fputs(HELP, stdout);
+				help();
 			return EXIT_FAILURE;
         }
 	}
