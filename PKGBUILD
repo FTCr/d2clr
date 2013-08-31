@@ -10,5 +10,5 @@ source=("git://github.com/FTCr/D2Clicker.git")
 md5sums=('SKIP')
 build(){
   cd "${srcdir}/D2Clicker"
-  make install EXEC_PREFIX="${pkgdir}/usr/local"
+  make install PREFIX="${pkgdir}/usr/local"
 }
