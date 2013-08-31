@@ -29,3 +29,5 @@ install:
 	install -s ${NAME} "${exec_prefix}/bin"
 uninstall:
 	rm "${exec_prefix}/bin/${FNAME}"
+clean:
+	rm "${FNAME}"
