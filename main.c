@@ -82,7 +82,7 @@ DBusHandlerResult signal_filter(DBusConnection *connection, DBusMessage *msg, vo
 	return DBUS_HANDLER_RESULT_HANDLED;
 }
 
-#define usage() printf("Example of use: d2clr -x 10 -y 10\n", argv[0]);
+#define usage() printf("Example of use: d2clr -x 540 -y 360\n");
 
 int main(int argc, char **argv)
 {
