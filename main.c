@@ -25,16 +25,22 @@
 #include <X11/Xlib.h>
 #include <X11/extensions/XTest.h>
 
+#define NOTIFY_H_MSG_RU "Состояние подбора игры"
+#define NOTIFY_B_MSG_RU "Ваша игра готова"
+#define DBUS_RULE "eavesdrop=true,type='method_call'"
+
+#define HELP "Usage d2clr [OPTIONS]...\n" \
+"Actions:\n" \
+"  -x,-X                   X \"Accept\" button coordinate.\n" \
+"  -y,-Y                   Y \"Accept\" button coordinate.\n" \
+"  -h                      Print help.\n"
+
 typedef struct
 {
 	Display *display;
 	int x;
 	int y;
 } m_data;
-
-#define NOTIFY_H_MSG_RU "Состояние подбора игры"
-#define NOTIFY_B_MSG_RU "Ваша игра готова"
-#define DBUS_RULE "eavesdrop=true,type='method_call'"
 
 DBusHandlerResult signal_filter(DBusConnection *connection, DBusMessage *msg, void *user_data)
 {
@@ -82,21 +88,19 @@ DBusHandlerResult signal_filter(DBusConnection *connection, DBusMessage *msg, vo
 	return DBUS_HANDLER_RESULT_HANDLED;
 }
 
-#define usage() printf("Example of use: d2clr -x 540 -y 360\n");
-
 int main(int argc, char **argv)
 {
 	if (argc <= 4)
 	{
-		usage();
+		fputs(HELP, stdout);
 		return EXIT_FAILURE;
 	}
 	
 	m_data data;
 	
-    int opt = 0;
-	opterr = 0;
-	while ((opt = getopt(argc,argv,"X:x:Y:y:")) != -1)
+	int opt = 0;
+	//opterr = 0;
+	while ((opt = getopt(argc,argv,"X:x:Y:y:h:")) != -1)
 	{
 		switch (opt)
 		{
@@ -106,8 +110,8 @@ int main(int argc, char **argv)
 			case 'Y': case 'y':
 				sscanf(optarg, "%d", &data.y);
 			break;
-			case '?':
-				usage();
+			case 'h': case '?':
+				fputs(HELP, stdout);
 			return EXIT_FAILURE;
         }
 	}
