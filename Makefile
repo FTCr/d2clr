@@ -25,6 +25,7 @@ all:
 	${LC_M} gcc `${CLFLAGS}` -std=gnu99 ${SOURCES} -o ${FNAME}
 install:
 	${LC_M} gcc `${CLFLAGS}` -std=gnu99 ${SOURCES} -o ${FNAME}
+	install -d "${exec_prefix}/bin"
 	install -s ${NAME} "${exec_prefix}/bin"
 uninstall:
 	rm "${exec_prefix}/bin/${FNAME}"
