@@ -31,6 +31,12 @@
 #define NOTIFY_B_MSG_EN "Your game is ready"
 #define NOTIFY_H_MSG_DE "Matchmaking-Status"
 #define NOTIFY_B_MSG_DE "Ihr Spiel ist bereit"
+#define NOTIFY_H_MSG_CS "Stav vyhledávání zápasů"
+#define NOTIFY_B_MSG_CS "Tvá hra je připravena"
+#define NOTIFY_H_MSG_FR "État de la création de match"
+#define NOTIFY_B_MSG_FR "Votre partie est prête"
+
+
 
 #define DBUS_RULE "eavesdrop=true,type='method_call'"
 
@@ -38,14 +44,16 @@
 "Actions:\n" \
 "  -x,-X                   X \"Accept\" button coordinate.\n" \
 "  -y,-Y                   Y \"Accept\" button coordinate.\n" \
-"  -l(en|ru|de)            Language \"Dota 2\" game.\n" \
+"  -l                      Language \"Dota 2\" game. ISO 639-1 codes.\n" \
 "  -h                      Print help.\n"
 
 enum
 {
 	en,
 	ru,
-	de
+	de,
+	cs,
+	fr
 } lang;
 
 typedef struct
@@ -86,6 +94,14 @@ DBusHandlerResult signal_filter(DBusConnection *connection, DBusMessage *msg, vo
 			case de:
 				notify_h = NOTIFY_H_MSG_DE;
 				notify_b = NOTIFY_B_MSG_DE;
+			break;
+			case cs:
+				notify_h = NOTIFY_H_MSG_CS;
+				notify_b = NOTIFY_B_MSG_CS;
+			break;
+			case fr:
+				notify_h = NOTIFY_H_MSG_FR;
+				notify_b = NOTIFY_B_MSG_FR;
 			break;
 		}
 		if (strcmp(val, notify_h) == 0) 
@@ -149,6 +165,10 @@ int main(int argc, char **argv)
 					data.lang = ru;
 				else if (strcmp(optarg, "de") == 0)
 					data.lang = de;
+				else if (strcmp(optarg, "cs") == 0)
+					data.lang = cs;
+				else if (strcmp(optarg, "fr") == 0)
+					data.lang = fr;
 				else
 				{
 					printf("Unknow lang!\n");
