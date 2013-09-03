@@ -139,20 +139,20 @@ DBusHandlerResult signal_filter(DBusConnection *connection, DBusMessage *msg, vo
 
 int main(int argc, char **argv)
 {
-	if (argc <= 6)
+	/*if (argc <= 6)
 	{
 		help();
 		return EXIT_FAILURE;
-	}
+	}*/
 	
-	m_data data;
+	m_data data = {NULL, 540, 360, ru};
 
 	const char *short_options = "x:y:X:Y:l:h";
 	const struct option long_options[] =
 	{
 		{"lang", required_argument, NULL, 'l'},
 		{"help", no_argument, NULL, 'h'},
-		{NULL,0,NULL,0}
+		{NULL, 0, NULL, 0}
 	};
 	
 	int opt;
