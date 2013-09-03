@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <getopt.h>
 #include <dbus/dbus.h>
 #include <dbus/dbus-glib-lowlevel.h>
 #include <X11/Xlib.h>
@@ -40,12 +41,12 @@
 
 #define DBUS_RULE "eavesdrop=true,type='method_call'"
 
-#define HELP "Usage d2clr [OPTIONS]...\n" \
+#define HELP "Usage: d2clr [OPTIONS]...\n" \
 "Actions:\n" \
-"  -x,-X                   X \"Accept\" button coordinate.\n" \
-"  -y,-Y                   Y \"Accept\" button coordinate.\n" \
-"  -l                      Language \"Dota 2\" game. ISO 639-1 codes.\n" \
-"  -h                      Print help.\n"
+"  -x, -X                   X \"Accept\" button coordinate.\n" \
+"  -y, -Y                   Y \"Accept\" button coordinate.\n" \
+"  -l, --lang               Language \"Dota 2\" game. ISO 639-1 codes.\n" \
+"  -h, --help               Print help.\n"
 
 enum
 {
@@ -145,10 +146,18 @@ int main(int argc, char **argv)
 	}
 	
 	m_data data;
+
+	const char *short_options = "x:y:X:Y:l:h";
+	const struct option long_options[] =
+	{
+		{"lang", required_argument, NULL, 'l'},
+		{"help", no_argument, NULL, 'h'},
+		{NULL,0,NULL,0}
+	};
 	
-	int opt = 0;
-	//opterr = 0;
-	while ((opt = getopt(argc,argv,"X:x:Y:y:l:h:")) != -1)
+	int opt;
+	int opt_index = -1;
+	while ((opt = getopt_long(argc, argv, short_options, long_options, &opt_index)) != -1)
 	{
 		switch (opt)
 		{
@@ -178,9 +187,8 @@ int main(int argc, char **argv)
 			case 'h': case '?':
 				help();
 			return EXIT_FAILURE;
-        }
+		}
 	}
-	
 	data.display = XOpenDisplay(NULL);
 	if (!data.display)
 	{
