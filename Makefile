@@ -21,9 +21,9 @@ else
 endif
 
 all:
-	${LC_M} gcc `${CLFLAGS}` -std=gnu99 ${SOURCES} -o ${FNAME}
+	${LC_M} gcc -std=gnu99 ${SOURCES} -o ${FNAME} `${CLFLAGS}`
 install:
-	${LC_M} gcc `${CLFLAGS}` -std=gnu99 ${SOURCES} -o ${FNAME}
+	${LC_M} gcc -std=gnu99 ${SOURCES} -o ${FNAME} `${CLFLAGS}`
 	install -d "${prefix}/bin"
 	install -s ${NAME} "${prefix}/bin"
 uninstall:
