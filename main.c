@@ -45,7 +45,6 @@
 "Actions:\n" \
 "  -x, -X                   X \"Accept\" button coordinate.\n" \
 "  -y, -Y                   Y \"Accept\" button coordinate.\n" \
-"  -l, --lang               Language \"Dota 2\" game. ISO 639-1 codes.\n" \
 "  -h, --help               Print help.\n"
 
 enum
@@ -62,7 +61,7 @@ typedef struct
 	Display *display;
 	int x;
 	int y;
-	int lang;
+	short lang;
 } m_data;
 
 DBusHandlerResult signal_filter(DBusConnection *connection, DBusMessage *msg, void *user_data)
@@ -135,6 +134,60 @@ DBusHandlerResult signal_filter(DBusConnection *connection, DBusMessage *msg, vo
 	return DBUS_HANDLER_RESULT_HANDLED;
 }
 
+short get_steam_lang()
+{
+	//getting steam config file path
+	char *home = getenv("HOME");
+	if (home == NULL) return -1;
+	
+	char *steam_cfg_path = malloc(strlen(home) + sizeof(char) * 20);
+	if (steam_cfg_path == NULL) return -1;
+	
+	strcpy(steam_cfg_path, home);
+	strcat(steam_cfg_path, "/.steam/registry.vdf");
+	
+	//read config file
+	FILE *file = fopen(steam_cfg_path, "r");
+	free(steam_cfg_path);
+	if (file == NULL) return -1;
+	fseek(file, 0, SEEK_END);
+	int size = ftell(file);
+	fseek(file, 0, SEEK_SET);
+	char *buffer = malloc(size + 1);
+	if (buffer == NULL)
+	{
+		fclose(file);
+		return -1;
+	}
+	fread(buffer, size, size, file);
+	fclose(file);
+	
+	//find lang
+	char lang[60];
+	char *p = buffer, *p2 = NULL;
+	while(*p != '\0')
+	{
+		if (strncmp(p, "Language", 8) == 0)
+		{
+			p += sizeof(char) * (8 + 1);
+			p = strchr(p, '"') + sizeof(char);
+			p2 = strchr(p, '"');
+			*p2 = '\0';
+			strcpy(lang, p);
+		}
+		
+		p += sizeof(char);
+	}
+	free(buffer);
+	if (strcmp(lang, "english") == 0) return en;
+	else if (strcmp(lang, "russian") == 0) return ru;
+	else if (strcmp(lang, "german") == 0) return de;
+	else if (strcmp(lang, "czech") == 0) return cs;
+	else if (strcmp(lang, "french") == 0) return fr;
+	else return -1;
+}
+
+
 #define help() fputs(HELP, stdout)
 
 int main(int argc, char **argv)
@@ -146,11 +199,17 @@ int main(int argc, char **argv)
 	}*/
 	
 	m_data data = {NULL, 540, 360, ru};
-
-	const char *short_options = "x:y:X:Y:l:h";
+	
+	if ((data.lang = get_steam_lang()) == -1)
+	{
+		fprintf(stderr, "Language not found!\n");
+		return EXIT_FAILURE;
+	}
+	
+	const char *short_options = "x:y:X:Y:lh";
 	const struct option long_options[] =
 	{
-		{"lang", required_argument, NULL, 'l'},
+		{"lang", no_argument, NULL, 'l'},
 		{"help", no_argument, NULL, 'h'},
 		{NULL, 0, NULL, 0}
 	};
@@ -168,6 +227,9 @@ int main(int argc, char **argv)
 				sscanf(optarg, "%d", &data.y);
 			break;
 			case 'l':
+				fprintf(stderr, "-l, --lang parameters are not supported anymore. Language is now detected automatically instead.\n");
+			break;
+			/*case 'l':
 				if (strcmp(optarg, "en") == 0)
 					data.lang = en;
 				else if (strcmp(optarg, "ru") == 0)
@@ -183,16 +245,16 @@ int main(int argc, char **argv)
 					printf("Unknow lang!\n");
 					return EXIT_FAILURE;
 				}
-			break;
+			break;*/
 			case 'h': case '?':
 				help();
-			return EXIT_FAILURE;
+				return EXIT_FAILURE;
 		}
 	}
 	data.display = XOpenDisplay(NULL);
 	if (!data.display)
 	{
-		g_error("Cannot open display.\n");
+		fprintf(stderr, "Cannot open display.\n");
 		return EXIT_FAILURE;
 	}
 	
