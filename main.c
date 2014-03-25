@@ -256,7 +256,7 @@ int main(int argc, char **argv)
 	data.display = XOpenDisplay(NULL);
 	if (!data.display)
 	{
-		print_m("Cannot open display.\n");
+		print_m("Can't open display!\n");
 		return EXIT_FAILURE;
 	}
 	
