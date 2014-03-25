@@ -190,6 +190,7 @@ short get_steam_lang()
 
 
 #define help() fputs(HELP, stdout)
+#define print_m(s) printf(s); fflush(stdout)
 
 int main(int argc, char **argv)
 {
@@ -203,7 +204,7 @@ int main(int argc, char **argv)
 	
 	if ((data.lang = get_steam_lang()) == -1)
 	{
-		fprintf(stderr, "Language not found!\n");
+		print_m("Language not found!\n");
 		return EXIT_FAILURE;
 	}
 	
@@ -228,7 +229,7 @@ int main(int argc, char **argv)
 				sscanf(optarg, "%d", &data.y);
 			break;
 			case 'l':
-				fprintf(stderr, "-l, --lang parameters are not supported anymore. Language is now detected automatically instead.\n");
+				print_m("-l, --lang parameters are not supported anymore. Language is now detected automatically instead.\n");
 			break;
 			/*case 'l':
 				if (strcmp(optarg, "en") == 0)
@@ -255,7 +256,7 @@ int main(int argc, char **argv)
 	data.display = XOpenDisplay(NULL);
 	if (!data.display)
 	{
-		fprintf(stderr, "Cannot open display.\n");
+		print_m("Cannot open display.\n");
 		return EXIT_FAILURE;
 	}
 	
