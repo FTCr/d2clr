@@ -113,7 +113,8 @@ DBusHandlerResult signal_filter(DBusConnection *connection, DBusMessage *msg, vo
 			{
 				//activated Dota 2 window
 				sleep(1);
-				system("wmctrl -a \"DOTA 2 - OpenGL\"");
+				//system("wmctrl -a \"DOTA 2 - OpenGL\"");
+				system("xdotool windowactivate `xdotool search \"DOTA 2 - OpenGL\"`");
 				sleep(1);
 				//mouse move
 				Window root = DefaultRootWindow(data->display);
