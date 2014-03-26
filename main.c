@@ -192,7 +192,7 @@ short get_steam_lang()
 
 
 #define help() fputs(HELP, stdout)
-#define print_m(s) printf(s); fflush(stdout)
+#define print_e(s) printf("%s\n", s); fflush(stdout)
 
 unsigned int p_exist(unsigned int pid)
 {
@@ -225,7 +225,7 @@ int main(int argc, char **argv)
 	FILE *file= fopen(filename, "a+");
 	if (file == NULL)
 	{
-		print_m("Can't create or open PID file!\n");
+		print_e("Can't create or open PID file!");
 		return EXIT_FAILURE;
 	}
 	
@@ -241,7 +241,7 @@ int main(int argc, char **argv)
 		{
 			if (p_exist(pid))
 			{
-				print_m("d2clr already running!\n");
+				print_e("d2clr already running!");
 				fclose(file);
 				return EXIT_FAILURE;
 			}
@@ -274,7 +274,7 @@ int main(int argc, char **argv)
 	
 	if ((data.lang = get_steam_lang()) == -1)
 	{
-		print_m("Language not found!\n");
+		print_e("Language not found!");
 		return EXIT_FAILURE;
 	}
 	
@@ -299,7 +299,7 @@ int main(int argc, char **argv)
 				sscanf(optarg, "%d", &data.y);
 			break;
 			case 'l':
-				print_m("-l, --lang parameters are not supported anymore. Language is now detected automatically instead.\n");
+				print_e("-l, --lang parameters are not supported anymore. Language is now detected automatically instead.");
 			break;
 			/*case 'l':
 				if (strcmp(optarg, "en") == 0)
@@ -326,7 +326,7 @@ int main(int argc, char **argv)
 	data.display = XOpenDisplay(NULL);
 	if (!data.display)
 	{
-		print_m("Can't open display!\n");
+		print_e("Can't open display!");
 		return EXIT_FAILURE;
 	}
 	
