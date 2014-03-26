@@ -47,6 +47,7 @@
 "Actions:\n" \
 "  -x, -X                   X \"Accept\" button coordinate.\n" \
 "  -y, -Y                   Y \"Accept\" button coordinate.\n" \
+"  -m                       Minimize after accept.\n" \
 "  -h, --help               Print help.\n"
 
 enum
@@ -64,6 +65,7 @@ typedef struct
 	int x;
 	int y;
 	short lang;
+	char is_min;
 } m_data;
 
 DBusHandlerResult signal_filter(DBusConnection *connection, DBusMessage *msg, void *user_data)
@@ -131,6 +133,8 @@ DBusHandlerResult signal_filter(DBusConnection *connection, DBusMessage *msg, vo
 					XFlush(data->display);
 					usleep(500000); //0.5 sec
 				}
+				if (data->is_min == TRUE)
+					system("xdotool windowminimize `xdotool search --name \"DOTA 2 - OpenGL\"`");
 			}
 		}
 	}
@@ -270,7 +274,7 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}*/
 	
-	m_data data = {NULL, 540, 360, ru};
+	m_data data = {NULL, 540, 360, ru, FALSE};
 	
 	if ((data.lang = get_steam_lang()) == -1)
 	{
@@ -278,7 +282,7 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 	
-	const char *short_options = "x:y:X:Y:lh";
+	const char *short_options = "x:y:X:Y:lhm";
 	const struct option long_options[] =
 	{
 		{"lang", no_argument, NULL, 'l'},
@@ -300,6 +304,9 @@ int main(int argc, char **argv)
 			break;
 			case 'l':
 				print_e("-l, --lang parameters are not supported anymore. Language is now detected automatically instead.");
+			break;
+			case 'm':
+				data.is_min = TRUE;
 			break;
 			/*case 'l':
 				if (strcmp(optarg, "en") == 0)
