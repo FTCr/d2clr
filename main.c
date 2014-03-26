@@ -217,57 +217,6 @@ unsigned int p_exist(unsigned int pid)
 
 int main(int argc, char **argv)
 {
-	//*******************PID*******************
-	const char *home = getenv("HOME");
-	if (home == NULL) return EXIT_FAILURE;
-	
-	char *filename = malloc((strlen(home) + strlen("/.cache/d2clr.pid")) * sizeof(char));
-	if (filename == NULL) return EXIT_FAILURE;
-	strcpy(filename, home);
-	strcat(filename, "/.cache/d2clr.pid");
-	
-	FILE *file= fopen(filename, "a+");
-	if (file == NULL)
-	{
-		print_e("Can't create or open PID file!");
-		return EXIT_FAILURE;
-	}
-	
-	unsigned int pid = 0;
-	char *buffer = malloc(sizeof(char) * 10);
-	fread(buffer, 10, sizeof(char), file);
-	pid = strtoul(buffer, NULL, 10);
-	free(buffer);
-	
-	if (pid)
-	{
-		if (pid != getpid())
-		{
-			if (p_exist(pid))
-			{
-				print_e("d2clr already running!");
-				fclose(file);
-				return EXIT_FAILURE;
-			}
-			else
-			{
-				pid = getpid();
-			}
-		}
-	}
-	else
-	{
-		pid = getpid();
-	}
-	fclose(file);
-	
-	file = fopen(filename, "w");
-	free(filename);
-	fprintf(file, "%d", pid);
-	fclose(file);
-	//************************************************************
-	
-	
 	/*if (argc <= 6)
 	{
 		help();
@@ -275,12 +224,6 @@ int main(int argc, char **argv)
 	}*/
 	
 	m_data data = {NULL, 540, 360, ru, FALSE};
-	
-	if ((data.lang = get_steam_lang()) == -1)
-	{
-		print_e("Language not found!");
-		return EXIT_FAILURE;
-	}
 	
 	const char *short_options = "x:y:X:Y:lhm";
 	const struct option long_options[] =
@@ -334,6 +277,62 @@ int main(int argc, char **argv)
 	if (!data.display)
 	{
 		print_e("Can't open display!");
+		return EXIT_FAILURE;
+	}
+	
+	//*******************PID*******************
+	const char *home = getenv("HOME");
+	if (home == NULL) return EXIT_FAILURE;
+	
+	char *filename = malloc((strlen(home) + strlen("/.cache/d2clr.pid")) * sizeof(char));
+	if (filename == NULL) return EXIT_FAILURE;
+	strcpy(filename, home);
+	strcat(filename, "/.cache/d2clr.pid");
+	
+	FILE *file= fopen(filename, "a+");
+	if (file == NULL)
+	{
+		print_e("Can't create or open PID file!");
+		return EXIT_FAILURE;
+	}
+	
+	unsigned int pid = 0;
+	char *buffer = malloc(sizeof(char) * 10);
+	fread(buffer, 10, sizeof(char), file);
+	pid = strtoul(buffer, NULL, 10);
+	free(buffer);
+	
+	if (pid)
+	{
+		if (pid != getpid())
+		{
+			if (p_exist(pid))
+			{
+				print_e("d2clr already running!");
+				fclose(file);
+				return EXIT_FAILURE;
+			}
+			else
+			{
+				pid = getpid();
+			}
+		}
+	}
+	else
+	{
+		pid = getpid();
+	}
+	fclose(file);
+	
+	file = fopen(filename, "w");
+	free(filename);
+	fprintf(file, "%d", pid);
+	fclose(file);
+	//************************************************************
+	
+	if ((data.lang = get_steam_lang()) == -1)
+	{
+		print_e("Language not found!");
 		return EXIT_FAILURE;
 	}
 	
