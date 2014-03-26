@@ -25,6 +25,8 @@
 #include <dbus/dbus-glib-lowlevel.h>
 #include <X11/Xlib.h>
 #include <X11/extensions/XTest.h>
+#include <sys/stat.h>
+#include <errno.h>
 
 #define NOTIFY_H_MSG_RU "Состояние подбора игры"
 #define NOTIFY_B_MSG_RU "Ваша игра готова"
@@ -160,7 +162,7 @@ short get_steam_lang()
 		fclose(file);
 		return -1;
 	}
-	fread(buffer, size, size, file);
+	fread(buffer, size, sizeof(char), file);
 	fclose(file);
 	
 	//find lang
@@ -192,8 +194,76 @@ short get_steam_lang()
 #define help() fputs(HELP, stdout)
 #define print_m(s) printf(s); fflush(stdout)
 
+unsigned int p_exist(unsigned int pid)
+{
+	struct stat sts;
+	char *filename = malloc(sizeof(char) * 50);
+	sprintf(filename, "/proc/%d", pid);
+	if (stat(filename, &sts) == -1 && errno == ENOENT)
+	{
+		free(filename);
+		return FALSE;
+	}
+	else
+	{
+		free(filename);
+		return TRUE;
+	}
+}
+
 int main(int argc, char **argv)
 {
+	//*******************PID*******************
+	const char *home = getenv("HOME");
+	if (home == NULL) return EXIT_FAILURE;
+	
+	char *filename = malloc((strlen(home) + strlen("/.cache/d2clr.pid")) * sizeof(char));
+	if (filename == NULL) return EXIT_FAILURE;
+	strcpy(filename, home);
+	strcat(filename, "/.cache/d2clr.pid");
+	
+	FILE *file= fopen(filename, "a+");
+	if (file == NULL)
+	{
+		print_m("Can't create or open PID file!\n");
+		return EXIT_FAILURE;
+	}
+	
+	unsigned int pid = 0;
+	char *buffer = malloc(sizeof(char) * 10);
+	fread(buffer, 10, sizeof(char), file);
+	pid = strtoul(buffer, NULL, 10);
+	free(buffer);
+	
+	if (pid)
+	{
+		if (pid != getpid())
+		{
+			if (p_exist(pid))
+			{
+				print_m("d2clr already running!\n");
+				fclose(file);
+				return EXIT_FAILURE;
+			}
+			else
+			{
+				pid = getpid();
+			}
+		}
+	}
+	else
+	{
+		pid = getpid();
+	}
+	fclose(file);
+	
+	file = fopen(filename, "w");
+	free(filename);
+	fprintf(file, "%d", pid);
+	fclose(file);
+	//************************************************************
+	
+	
 	/*if (argc <= 6)
 	{
 		help();
