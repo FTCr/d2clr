@@ -196,7 +196,7 @@ short get_steam_lang()
 
 
 #define help() fputs(HELP, stdout)
-#define print_e(s) printf("%s\n", s); fflush(stdout)
+#define print_e(s) fprintf(stderr, "%s\n", s);
 
 unsigned int p_exist(unsigned int pid)
 {
@@ -246,7 +246,8 @@ int main(int argc, char **argv)
 				sscanf(optarg, "%d", &data.y);
 			break;
 			case 'l':
-				print_e("-l, --lang parameters are not supported anymore. Language is now detected automatically instead.");
+				printf("%s", "-l, --lang parameters are not supported anymore. Language is now detected automatically instead.\n");
+				fflush(stdout);
 			break;
 			case 'm':
 				data.is_min = TRUE;
