@@ -1,5 +1,5 @@
 pkgname=d2clr-git
-pkgver=2014.03.11
+pkgver=2014.04.26
 pkgrel=1
 pkgdesc="Auto click button 'Accept' in Dota 2 game"
 url="https://github.com/FTCr/d2clr"
