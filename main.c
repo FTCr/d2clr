@@ -281,56 +281,6 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 	
-	//*******************PID*******************
-	const char *home = getenv("HOME");
-	if (home == NULL) return EXIT_FAILURE;
-	
-	char *filename = malloc((strlen(home) + strlen("/.cache/d2clr.pid")) * sizeof(char));
-	if (filename == NULL) return EXIT_FAILURE;
-	strcpy(filename, home);
-	strcat(filename, "/.cache/d2clr.pid");
-	
-	FILE *file= fopen(filename, "a+");
-	if (file == NULL)
-	{
-		print_e("Can't create or open PID file!");
-		return EXIT_FAILURE;
-	}
-	
-	unsigned int pid = 0;
-	char *buffer = malloc(sizeof(char) * 10);
-	fread(buffer, 10, sizeof(char), file);
-	pid = strtoul(buffer, NULL, 10);
-	free(buffer);
-	
-	if (pid)
-	{
-		if (pid != getpid())
-		{
-			if (p_exist(pid))
-			{
-				print_e("d2clr already running!");
-				fclose(file);
-				return EXIT_FAILURE;
-			}
-			else
-			{
-				pid = getpid();
-			}
-		}
-	}
-	else
-	{
-		pid = getpid();
-	}
-	fclose(file);
-	
-	file = fopen(filename, "w");
-	free(filename);
-	fprintf(file, "%d", pid);
-	fclose(file);
-	//************************************************************
-	
 	if ((data.lang = get_steam_lang()) == -1)
 	{
 		print_e("Language not found!");
@@ -361,12 +311,73 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 	
-	g_message("Listening D-BUS");
-	
 	dbus_connection_add_filter(connect, signal_filter, &data, NULL);
-	g_main_loop_run(loop);
 	
-	XCloseDisplay(data.display);
-	
-	return EXIT_SUCCESS; 
+	pid_t pidf = fork();
+	if (pidf == -1)
+	{
+		XCloseDisplay(data.display);
+		return EXIT_FAILURE;
+	}
+	else if (!pidf)
+	{
+		setsid();
+		g_message("Listening D-BUS");
+		g_main_loop_run(loop);
+		return EXIT_SUCCESS;
+	}
+	else
+	{
+		const char *home = getenv("HOME");
+		if (home == NULL) return EXIT_FAILURE;
+		
+		char *filename = malloc((strlen(home) + strlen("/.cache/d2clr.pid")) * sizeof(char));
+		if (filename == NULL) return EXIT_FAILURE;
+		strcpy(filename, home);
+		strcat(filename, "/.cache/d2clr.pid");
+		
+		FILE *file = fopen(filename, "a+");
+		if (file == NULL)
+		{
+			print_e("Can't create or open PID file!");
+			kill(pidf, SIGTERM);
+			XCloseDisplay(data.display);
+			return EXIT_FAILURE;
+		}
+		
+		pid_t pid = 0;
+		char *buffer = malloc(sizeof(char) * 10);
+		fread(buffer, 10, sizeof(char), file);
+		fclose(file);
+		pid = strtoul(buffer, NULL, 10);
+		free(buffer);
+		
+		if (pid)
+		{
+			if (pid != pidf)
+			{
+				if (p_exist(pid))
+				{
+					print_e("d2clr already running!");
+					fclose(file);
+					kill(pidf, SIGTERM);
+					XCloseDisplay(data.display);
+					return EXIT_FAILURE;
+				}
+				else
+				{
+					pid = pidf;
+				}
+			}
+		}
+		else
+		{
+			pid = pidf;
+		}
+		file = fopen(filename, "w");
+		free(filename);
+		fprintf(file, "%d", pid);
+		fclose(file);
+		return EXIT_SUCCESS;
+	}
 }
