@@ -316,6 +316,7 @@ int main(int argc, char **argv)
 	pid_t pidf = fork();
 	if (pidf == -1)
 	{
+		print_e("Can't create daemon!");
 		XCloseDisplay(data.display);
 		return EXIT_FAILURE;
 	}
