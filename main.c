@@ -359,7 +359,6 @@ int main(int argc, char **argv)
 				if (p_exist(pid))
 				{
 					print_e("d2clr already running!");
-					fclose(file);
 					kill(pidf, SIGTERM);
 					XCloseDisplay(data.display);
 					return EXIT_FAILURE;
