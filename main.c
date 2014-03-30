@@ -43,7 +43,7 @@
 
 #define DBUS_RULE "eavesdrop=true,type='method_call'"
 
-#define HELP "Usage: d2clr [OPTIONS]...\n" \
+#define HELP "Usage: d2clrd [OPTIONS]...\n" \
 "Actions:\n" \
 "  -x, -X                   X \"Accept\" button coordinate.\n" \
 "  -y, -Y                   Y \"Accept\" button coordinate.\n" \
@@ -332,10 +332,10 @@ int main(int argc, char **argv)
 		const char *home = getenv("HOME");
 		if (home == NULL) return EXIT_FAILURE;
 		
-		char *filename = malloc((strlen(home) + strlen("/.cache/d2clr.pid")) * sizeof(char));
+		char *filename = malloc((strlen(home) + strlen("/.cache/d2clrd.pid")) * sizeof(char));
 		if (filename == NULL) return EXIT_FAILURE;
 		strcpy(filename, home);
-		strcat(filename, "/.cache/d2clr.pid");
+		strcat(filename, "/.cache/d2clrd.pid");
 		
 		FILE *file = fopen(filename, "a+");
 		if (file == NULL)
@@ -359,7 +359,7 @@ int main(int argc, char **argv)
 			{
 				if (p_exist(pid))
 				{
-					print_e("d2clr already running!");
+					print_e("d2clrd already running!");
 					kill(pidf, SIGTERM);
 					XCloseDisplay(data.display);
 					return EXIT_FAILURE;

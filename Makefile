@@ -1,8 +1,7 @@
 SHELL = /bin/sh 
 
-NAME = d2clr
+NAME = d2clrd
 
-FNAME   = ${NAME}
 OBJECTS = *.o
 SOURCES = *.c
 
@@ -21,12 +20,12 @@ else
 endif
 
 all:
-	${LC_M} gcc -std=gnu99 ${SOURCES} -o ${FNAME} `${CLFLAGS}`
+	${LC_M} gcc -std=gnu99 ${SOURCES} -o ${NAME} `${CLFLAGS}`
 install:
-	${LC_M} gcc -std=gnu99 ${SOURCES} -o ${FNAME} `${CLFLAGS}`
+	${LC_M} gcc -std=gnu99 ${SOURCES} -o ${NAME} `${CLFLAGS}`
 	install -d "${prefix}/bin"
 	install -s ${NAME} "${prefix}/bin"
 uninstall:
-	rm "${prefix}/bin/${FNAME}"
+	rm "${prefix}/bin/${NAME}"
 clean:
-	rm "${FNAME}"
+	rm "${NAME}"
