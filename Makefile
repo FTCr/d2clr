@@ -9,7 +9,8 @@ LC_M := LC_MESSAGES=C
 
 PKG-CONFIG = pkg-config --cflags --libs
 
-CLFLAGS = ${PKG-CONFIG} glib-2.0 dbus-1 dbus-glib-1 x11 xtst
+CLFLAGS  = ${PKG-CONFIG} glib-2.0 dbus-1 dbus-glib-1 x11 xtst
+GCCFLAGS = -std=gnu99 -O2
 
 .PHONY = all
 
@@ -20,9 +21,9 @@ else
 endif
 
 all:
-	${LC_M} gcc -std=gnu99 ${SOURCES} -o ${NAME} `${CLFLAGS}`
+	${LC_M} gcc ${GCCFLAGS} ${SOURCES} -o ${NAME} `${CLFLAGS}`
 install:
-	${LC_M} gcc -std=gnu99 ${SOURCES} -o ${NAME} `${CLFLAGS}`
+	${LC_M} gcc ${GCCFLAGS} ${SOURCES} -o ${NAME} `${CLFLAGS}`
 	install -d "${prefix}/bin"
 	install -s ${NAME} "${prefix}/bin"
 uninstall:
