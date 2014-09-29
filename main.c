@@ -50,6 +50,8 @@
 "  -m                       Minimize after accept.\n" \
 "  -h, --help               Print help.\n"
 
+#define DEFAULT_SETTINGS {NULL, 775, 520, ru, FALSE}
+
 enum
 {
 	en,
@@ -223,7 +225,7 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}*/
 	
-	m_data data = {NULL, 540, 360, ru, FALSE};
+	m_data data = DEFAULT_SETTINGS;
 	
 	const char *short_options = "x:y:X:Y:lhm";
 	const struct option long_options[] =
