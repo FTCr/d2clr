@@ -50,7 +50,7 @@
 "  -m                       Minimize after accept.\n" \
 "  -h, --help               Print help.\n"
 
-#define DEFAULT_SETTINGS {NULL, 775, 520, ru, FALSE}
+#define DEFAULT_SETTINGS {NULL, 775, 425, ru, FALSE}
 
 enum
 {
