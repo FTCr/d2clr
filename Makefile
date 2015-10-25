@@ -2,8 +2,8 @@ SHELL = /bin/sh
 
 NAME = d2clrd
 
-OBJECTS = *.o
-SOURCES = *.c
+OBJECTS = src/*.o
+SOURCES = src/*.c
 
 LC_M := LC_MESSAGES=C
 
