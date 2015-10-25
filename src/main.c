@@ -220,10 +220,9 @@ int main(int argc, char **argv)
 {
 	m_data data = DEFAULT_SETTINGS;
 
-	const char *short_options = "x:y:X:Y:lhm";
+	const char *short_options = "hm";
 	const struct option long_options[] =
 	{
-		{"lang", no_argument, NULL, 'l'},
 		{"help", no_argument, NULL, 'h'},
 		{NULL, 0, NULL, 0}
 	};
