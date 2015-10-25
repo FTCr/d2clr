@@ -119,7 +119,6 @@ DBusHandlerResult signal_filter(DBusConnection *connection, DBusMessage *msg, vo
 			{
 				//activated Dota 2 window
 				sleep(1);
-				//system("wmctrl -a \"DOTA 2 - OpenGL\"");
 				system("xdotool windowactivate `xdotool search --name \"Dota 2\"`");
 				sleep(1);
 				//mouse move
@@ -219,12 +218,6 @@ unsigned int p_exist(unsigned int pid)
 
 int main(int argc, char **argv)
 {
-	/*if (argc <= 6)
-	{
-		help();
-		return EXIT_FAILURE;
-	}*/
-
 	m_data data = DEFAULT_SETTINGS;
 
 	const char *short_options = "x:y:X:Y:lhm";
@@ -247,30 +240,9 @@ int main(int argc, char **argv)
 			case 'Y': case 'y':
 				sscanf(optarg, "%d", &data.y);
 			break;
-			case 'l':
-				printf("%s", "-l, --lang parameters are not supported anymore. Language is now detected automatically instead.\n");
-				fflush(stdout);
-			break;
 			case 'm':
 				data.is_min = TRUE;
 			break;
-			/*case 'l':
-				if (strcmp(optarg, "en") == 0)
-					data.lang = en;
-				else if (strcmp(optarg, "ru") == 0)
-					data.lang = ru;
-				else if (strcmp(optarg, "de") == 0)
-					data.lang = de;
-				else if (strcmp(optarg, "cs") == 0)
-					data.lang = cs;
-				else if (strcmp(optarg, "fr") == 0)
-					data.lang = fr;
-				else
-				{
-					printf("Unknow lang!\n");
-					return EXIT_FAILURE;
-				}
-			break;*/
 			case 'h': case '?':
 				help();
 				return EXIT_FAILURE;
