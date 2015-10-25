@@ -24,7 +24,7 @@
 #include <dbus/dbus.h>
 #include <dbus/dbus-glib-lowlevel.h>
 #include <X11/Xlib.h>
-#include <X11/extensions/XTest.h>
+//#include <X11/extensions/XTest.h>
 #include <sys/stat.h>
 #include <errno.h>
 
@@ -45,12 +45,10 @@
 
 #define HELP "Usage: d2clrd [OPTIONS]...\n" \
 "Actions:\n" \
-"  -x, -X                   X \"Accept\" button coordinate.\n" \
-"  -y, -Y                   Y \"Accept\" button coordinate.\n" \
 "  -m                       Minimize after accept.\n" \
 "  -h, --help               Print help.\n"
 
-#define DEFAULT_SETTINGS {NULL, 775, 425, ru, FALSE}
+#define DEFAULT_SETTINGS {NULL, /*775, 425,*/ ru, FALSE}
 
 enum
 {
@@ -64,8 +62,8 @@ enum
 typedef struct
 {
 	Display *display;
-	int x;
-	int y;
+	/*int x;
+	int y;*/
 	short lang;
 	char is_min;
 } m_data;
@@ -121,6 +119,8 @@ DBusHandlerResult signal_filter(DBusConnection *connection, DBusMessage *msg, vo
 				sleep(1);
 				system("xdotool windowactivate `xdotool search --name \"Dota 2\"`");
 				sleep(1);
+				system("xdotool key KP_Enter");
+				/*
 				//mouse move
 				Window root = DefaultRootWindow(data->display);
 				XWarpPointer(data->display, None, root, 0, 0, 0, 0, data->x, data->y);
@@ -133,7 +133,7 @@ DBusHandlerResult signal_filter(DBusConnection *connection, DBusMessage *msg, vo
 					XTestFakeButtonEvent(data->display, 1, False, CurrentTime);
 					XFlush(data->display);
 					usleep(500000); //0.5 sec
-				}
+				}*/
 				if (data->is_min == TRUE)
 					system("xdotool windowminimize `xdotool search --name \"Dota 2\"`");
 			}
@@ -234,12 +234,12 @@ int main(int argc, char **argv)
 	{
 		switch (opt)
 		{
-			case 'X': case 'x':
+			/*case 'X': case 'x':
 				sscanf(optarg, "%d", &data.x);
 			break;
 			case 'Y': case 'y':
 				sscanf(optarg, "%d", &data.y);
-			break;
+			break;*/
 			case 'm':
 				data.is_min = TRUE;
 			break;

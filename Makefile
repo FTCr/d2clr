@@ -9,7 +9,7 @@ LC_M := LC_MESSAGES=C
 
 PKG-CONFIG = pkg-config --cflags --libs
 
-CLFLAGS  = ${PKG-CONFIG} glib-2.0 dbus-1 dbus-glib-1 x11 xtst
+CLFLAGS  = ${PKG-CONFIG} glib-2.0 dbus-1 dbus-glib-1 x11
 GCCFLAGS = -std=gnu99 -O2
 
 .PHONY = all
