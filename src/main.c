@@ -1,16 +1,16 @@
 /*
  * Copyright FIL 2013
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -75,17 +75,17 @@ DBusHandlerResult signal_filter(DBusConnection *connection, DBusMessage *msg, vo
 	if (dbus_message_is_method_call(msg, "org.freedesktop.Notifications", "Notify"))
 	{
 		m_data *data = (m_data*)user_data;
-		
+
 		DBusMessageIter iter;
 		dbus_message_iter_init(msg, &iter);
-		
+
 		int type = dbus_message_iter_get_arg_type(&iter);
-		
+
 		char *val;
 		for (int i = 0; i < 3; i++)
 			dbus_message_iter_next (&iter);
 		dbus_message_iter_get_basic (&iter, &val);
-		
+
 		char *notify_h, *notify_b;
 		switch (data->lang)
 		{
@@ -110,17 +110,17 @@ DBusHandlerResult signal_filter(DBusConnection *connection, DBusMessage *msg, vo
 				notify_b = NOTIFY_B_MSG_FR;
 			break;
 		}
-		if (strcmp(val, notify_h) == 0) 
+		if (strcmp(val, notify_h) == 0)
 		{
 			dbus_message_iter_next (&iter);
 			dbus_message_iter_get_basic (&iter, &val);
-			
+
 			if (strcmp(val, notify_b) == 0)
 			{
 				//activated Dota 2 window
 				sleep(1);
 				//system("wmctrl -a \"DOTA 2 - OpenGL\"");
-				system("xdotool windowactivate `xdotool search --name \"DOTA 2 - OpenGL\"`");
+				system("xdotool windowactivate `xdotool search --name \"Dota 2\"`");
 				sleep(1);
 				//mouse move
 				Window root = DefaultRootWindow(data->display);
@@ -136,7 +136,7 @@ DBusHandlerResult signal_filter(DBusConnection *connection, DBusMessage *msg, vo
 					usleep(500000); //0.5 sec
 				}
 				if (data->is_min == TRUE)
-					system("xdotool windowminimize `xdotool search --name \"DOTA 2 - OpenGL\"`");
+					system("xdotool windowminimize `xdotool search --name \"Dota 2\"`");
 			}
 		}
 	}
@@ -148,13 +148,13 @@ short get_steam_lang()
 	//getting steam config file path
 	char *home = getenv("HOME");
 	if (home == NULL) return -1;
-	
+
 	char *steam_cfg_path = malloc(strlen(home) + sizeof(char) * 20);
 	if (steam_cfg_path == NULL) return -1;
-	
+
 	strcpy(steam_cfg_path, home);
 	strcat(steam_cfg_path, "/.steam/registry.vdf");
-	
+
 	//read config file
 	FILE *file = fopen(steam_cfg_path, "r");
 	free(steam_cfg_path);
@@ -170,7 +170,7 @@ short get_steam_lang()
 	}
 	fread(buffer, size, sizeof(char), file);
 	fclose(file);
-	
+
 	//find lang
 	char lang[60];
 	char *p = buffer, *p2 = NULL;
@@ -184,7 +184,7 @@ short get_steam_lang()
 			*p2 = '\0';
 			strcpy(lang, p);
 		}
-		
+
 		p += sizeof(char);
 	}
 	free(buffer);
@@ -224,9 +224,9 @@ int main(int argc, char **argv)
 		help();
 		return EXIT_FAILURE;
 	}*/
-	
+
 	m_data data = DEFAULT_SETTINGS;
-	
+
 	const char *short_options = "x:y:X:Y:lhm";
 	const struct option long_options[] =
 	{
@@ -234,7 +234,7 @@ int main(int argc, char **argv)
 		{"help", no_argument, NULL, 'h'},
 		{NULL, 0, NULL, 0}
 	};
-	
+
 	int opt;
 	int opt_index = -1;
 	while ((opt = getopt_long(argc, argv, short_options, long_options, &opt_index)) != -1)
@@ -282,18 +282,18 @@ int main(int argc, char **argv)
 		print_e("Can't open display!");
 		return EXIT_FAILURE;
 	}
-	
+
 	if ((data.lang = get_steam_lang()) == -1)
 	{
 		print_e("Language not found!");
 		return EXIT_FAILURE;
 	}
-	
+
 	GMainLoop *loop = g_main_loop_new(NULL, FALSE);
-	
+
 	DBusError error;
 	dbus_error_init(&error);
-	
+
 	DBusConnection *connect = dbus_bus_get(DBUS_BUS_SESSION, &error);
 	if (dbus_error_is_set(&error))
 	{
@@ -301,20 +301,20 @@ int main(int argc, char **argv)
 		dbus_error_free(&error);
 		return EXIT_FAILURE;
 	}
-	
+
 	dbus_connection_setup_with_g_main(connect, NULL);
-	
+
 	dbus_bus_add_match(connect, DBUS_RULE, &error);
-	
+
 	if (dbus_error_is_set(&error))
 	{
 		g_error("Cannot add D-BUS match rule, cause: %s", error.message);
 		dbus_error_free(&error);
 		return EXIT_FAILURE;
 	}
-	
+
 	dbus_connection_add_filter(connect, signal_filter, &data, NULL);
-	
+
 	pid_t pidf = fork();
 	if (pidf == -1)
 	{
@@ -333,12 +333,12 @@ int main(int argc, char **argv)
 	{
 		const char *home = getenv("HOME");
 		if (home == NULL) return EXIT_FAILURE;
-		
+
 		char *filename = malloc((strlen(home) + strlen("/.cache/d2clrd.pid")) * sizeof(char));
 		if (filename == NULL) return EXIT_FAILURE;
 		strcpy(filename, home);
 		strcat(filename, "/.cache/d2clrd.pid");
-		
+
 		FILE *file = fopen(filename, "a+");
 		if (file == NULL)
 		{
@@ -347,14 +347,14 @@ int main(int argc, char **argv)
 			XCloseDisplay(data.display);
 			return EXIT_FAILURE;
 		}
-		
+
 		pid_t pid = 0;
 		char *buffer = malloc(sizeof(char) * 10);
 		fread(buffer, 10, sizeof(char), file);
 		fclose(file);
 		pid = strtoul(buffer, NULL, 10);
 		free(buffer);
-		
+
 		if (pid)
 		{
 			if (pid != pidf)
