@@ -195,10 +195,6 @@ short get_steam_lang()
 	else return -1;
 }
 
-
-#define help() fputs(HELP, stdout)
-#define print_e(s) fprintf(stderr, "%s\n", s);
-
 unsigned int p_exist(unsigned int pid)
 {
 	struct stat sts;
@@ -215,6 +211,8 @@ unsigned int p_exist(unsigned int pid)
 		return TRUE;
 	}
 }
+
+#define help() fputs(HELP, stdout)
 
 int main(int argc, char **argv)
 {
@@ -250,13 +248,13 @@ int main(int argc, char **argv)
 	data.display = XOpenDisplay(NULL);
 	if (!data.display)
 	{
-		print_e("Can't open display!");
+		fprintf(stdout, "Cannot open display!\n");
 		return EXIT_FAILURE;
 	}
 
 	if ((data.lang = get_steam_lang()) == -1)
 	{
-		print_e("Language not found!");
+		fprintf(stdout, "Language not found!\n");
 		return EXIT_FAILURE;
 	}
 
@@ -268,7 +266,7 @@ int main(int argc, char **argv)
 	DBusConnection *connect = dbus_bus_get(DBUS_BUS_SESSION, &error);
 	if (dbus_error_is_set(&error))
 	{
-		g_error("Cannot get System BUS Connection: %s", error.message);
+		fprintf(stderr, "Cannot get System BUS Connection: %s\n", error.message);
 		dbus_error_free(&error);
 		return EXIT_FAILURE;
 	}
@@ -279,7 +277,7 @@ int main(int argc, char **argv)
 
 	if (dbus_error_is_set(&error))
 	{
-		g_error("Cannot add D-BUS match rule, cause: %s", error.message);
+		fprintf(stderr, "Cannot add D-BUS match rule, cause: %s\n", error.message);
 		dbus_error_free(&error);
 		return EXIT_FAILURE;
 	}
@@ -289,14 +287,14 @@ int main(int argc, char **argv)
 	pid_t pidf = fork();
 	if (pidf == -1)
 	{
-		print_e("Can't create daemon!");
+		fprintf(stderr, "Cannot create daemon!\n");
 		XCloseDisplay(data.display);
 		return EXIT_FAILURE;
 	}
 	else if (!pidf)
 	{
 		setsid();
-		g_message("Listening D-BUS");
+		fprintf(stdout, "Listening D-BUS...\n");
 		g_main_loop_run(loop);
 		return EXIT_SUCCESS;
 	}
@@ -313,7 +311,7 @@ int main(int argc, char **argv)
 		FILE *file = fopen(filename, "a+");
 		if (file == NULL)
 		{
-			print_e("Can't create or open PID file!");
+			fprintf(stderr, "Cannot create or open PID file!\n");
 			kill(pidf, SIGTERM);
 			XCloseDisplay(data.display);
 			return EXIT_FAILURE;
@@ -332,7 +330,7 @@ int main(int argc, char **argv)
 			{
 				if (p_exist(pid))
 				{
-					print_e("d2clrd already running!");
+					fprintf(stderr, "d2clrd already running!\n");
 					kill(pidf, SIGTERM);
 					XCloseDisplay(data.display);
 					return EXIT_FAILURE;
